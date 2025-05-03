@@ -1,57 +1,94 @@
 import React from 'react';
-import styles from './App.css';
+import './App.css';
 import { useState } from 'react';
 
-export const App = () => {
-	const [value, setValue] = useState('');
-	// const [list , setList] = useState([]);
+const App = () => {
+	const [currentValue, setCurrentValue] = useState('');
+	const [items, setItems] = useState([]);
 	const [error, setError] = useState('');
 
-	const isValueVaild = value.length >= 3;
+	const handleNewInput = () => {
+		console.log('Кнопка нажата!'); // Проверка срабатывания кнопки
 
-	const onAddButtonClick = () => {};
+		try {
+			console.log('Пытаемся вызвать prompt...');
+			const userInput = window.alert('Введите новое значение:');
+			console.log('Результат prompt:', userInput);
 
-	const onInputButtonClick = () => {
-		const promptValue = prompt('Введите новое значение:');
-		if (promptValue === null) return;
-		if (promptValue.length < 3) {
-			setError('Введённое значение должно содержать минимум 3 символа');
-		} else {
-			setValue(promptValue);
-			setError('');
+			if (userInput === null) {
+				console.log('Пользователь отменил ввод');
+				return;
+			}
+
+			if (userInput.length < 3) {
+				console.log('Введено слишком короткое значение');
+				setError('Введенное значение должно содержать минимум 3 символа');
+				setCurrentValue('');
+			} else {
+				console.log('Введено корректное значение');
+				setCurrentValue(userInput);
+				setError('');
+			}
+		} catch (e) {
+			console.error('Ошибка при вызове prompt:', e);
+			setError('Произошла ошибка при вводе');
 		}
-		console.log('Полученое новое значение', promptValue);
-		setValue(promptValue || '');
+	};
+
+	const handleAddItem = () => {
+		if (currentValue.length < 3) return;
+
+		setItems([
+			...items,
+			{
+				id: Date.now(),
+				value: currentValue,
+				date: new Date().toLocaleString(),
+			},
+		]);
+		setCurrentValue('');
 	};
 
 	return (
-		<div className={styles.app}>
-			<h1 className={styles['page-heading']}>Ввод значения</h1>
-			<p className={styles['no-margin-text']}>
-				Текущее значение <code>value</code>: "
-				<output className={styles['current-value']}>{value}</output>"
-			</p>
-			{error && <div className={styles.error}> {error}</div>}
-			<div className={styles.buttonsContainer}>
-				<button className={styles.button} onClick={onInputButtonClick}>
+		<div className="app">
+			<h1>Ввод значения</h1>
+
+			<div className="value-display">
+				Текущее значение: "<span>{currentValue}</span>"
+			</div>
+
+			{error && <div className="error-message">{error}</div>}
+
+			<div className="buttons">
+				<button onClick={handleNewInput} className="action-button">
 					Ввести новое
 				</button>
 
 				<button
-					className={styles.button}
-					disabled={!isValueVaild}
-					onClick={onAddButtonClick}
+					onClick={handleAddItem}
+					disabled={currentValue.length < 3}
+					className={`action-button ${currentValue.length < 3 ? 'disabled' : ''}`}
 				>
 					Добавить в список
 				</button>
 			</div>
-			<div className={styles.listContainer}>
-				<h2 className={styles['list-he ading']}>Список:</h2>
-				<p className={styles['no-margin-text']}>Нет добавленных элементов</p>
-				<ul className={styles.list}>
-					<li className={styles['list-item']}>Первый элемент</li>
-				</ul>
+
+			<div className="list-container">
+				<h2>Список:</h2>
+				{items.length === 0 ? (
+					<p className="empty-message">Нет добавленных элементов</p>
+				) : (
+					<ul className="items-list">
+						{items.map((item) => (
+							<li key={item.id}>
+								{item.value} <small>({item.date})</small>
+							</li>
+						))}
+					</ul>
+				)}
 			</div>
 		</div>
 	);
 };
+
+export default App;
