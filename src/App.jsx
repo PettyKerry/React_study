@@ -8,11 +8,11 @@ const App = () => {
 	const [error, setError] = useState('');
 
 	const handleNewInput = () => {
-		console.log('Кнопка нажата!'); // Проверка срабатывания кнопки
+		console.log('Кнопка нажата!');
 
 		try {
 			console.log('Пытаемся вызвать prompt...');
-			const userInput = window.alert('Введите новое значение:');
+			const userInput = window.prompt('Введите новое значение:');
 			console.log('Результат prompt:', userInput);
 
 			if (userInput === null) {
